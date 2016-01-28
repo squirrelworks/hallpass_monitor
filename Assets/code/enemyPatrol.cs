@@ -4,13 +4,19 @@ using System.Collections;
 public class enemyPatrol : MonoBehaviour
 {
 
-	public GameObject[] wayPoints;
+	private GameObject[] wayPoints;
+	private GameObject[] myEnemies;
+
 
 	public float myTargetDistance = 2.0f;
 	int myMode = 1;
-	public GameObject[] myEnemies;
+
+
 	public float enemyCatchDist=5.0f;
 	public float myEvilness=1.0f;
+
+	public GameObject myYellingObject;
+
 	Transform goal;
 	GameObject mySelectedTarget;
 
@@ -23,6 +29,15 @@ public class enemyPatrol : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+
+
+		wayPoints = GameObject.FindGameObjectsWithTag("wayPoint");
+
+		myEnemies = GameObject.FindGameObjectsWithTag("teamMembers");
+
+		//myEnemies.Add(GameObject.FindWithTag("Player"));
+
+		myYellingObject.SetActive(false);
 
 		myAgent = GetComponent<NavMeshAgent> ();
 
@@ -43,10 +58,12 @@ public class enemyPatrol : MonoBehaviour
 
 		case 1:
 
-if (Vector3.Distance (transform.position, myAgent.destination) <= myTargetDistance) {
+
+   if (Vector3.Distance (transform.position, myAgent.destination) <= myTargetDistance) {
 				getNewTarget();
 			
 			}
+
 
                foreach (GameObject enemy in myEnemies) {
 
@@ -54,7 +71,7 @@ if (Vector3.Distance (transform.position, myAgent.destination) <= myTargetDistan
 
 
 				if (myEnemyDist <= enemyCatchDist) {
-					Debug.Log ("Hunting");
+					//Debug.Log ("Hunting");
 					myMode = 2;
 					//myAgent.destination = enemy.transform.position;
 					mySelectedTarget=enemy;
@@ -74,7 +91,9 @@ if (Vector3.Distance (transform.position, myAgent.destination) <= myTargetDistan
 
 
 					if (myEnemyDist >= enemyCatchDist) {
-					Debug.Log ("back to patrol");
+					//Debug.Log ("back to patrol");
+
+				myYellingObject.SetActive(false);
 					myMode = 1;
 				getNewTarget();
 
@@ -90,13 +109,16 @@ if (Vector3.Distance (transform.position, myAgent.destination) <= myTargetDistan
 
 				if (myTargetScript.myStamina<=0){
 					myMode = 1;
-					Debug.Log ("back to patrol");
+					//Debug.Log ("back to patrol");
+					myYellingObject.SetActive(false);
 					getNewTarget();
 
 				}
 				else
 				{
 					Debug.Log ("shouting");
+				
+					myYellingObject.SetActive(true);
 					mySelectedTarget.SendMessage("reciveDamage", myEvilness);
 				}
 

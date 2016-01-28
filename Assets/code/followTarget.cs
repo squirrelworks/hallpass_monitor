@@ -3,8 +3,9 @@ using System.Collections;
 
 public class followTarget : MonoBehaviour {
 	
-	public Transform goal;
-	public Transform punishmentGoal;
+	public GameObject goal;
+	public GameObject punishmentGoal;
+	//public GameObject levelManagerObject;
 
 	public float goalDistance=2.0f;
 	public float myStamina=1000.0f;
@@ -12,8 +13,24 @@ public class followTarget : MonoBehaviour {
 	NavMeshAgent myAgent;
 
 	void Start () {
-		 myAgent = GetComponent<NavMeshAgent>();
-		myAgent.destination = goal.position;
+		
+
+		punishmentGoal= GameObject.FindWithTag("endGoal");
+
+		if (gameObject.tag == "Player") {
+
+		}
+		else{
+			GameObject myObject = GameObject.FindWithTag ("Player");
+
+			Debug.Log ("team member goal: "+myObject.tag);
+			goal= GameObject.FindWithTag("Player");
+		}
+
+		myAgent = GetComponent<NavMeshAgent>();
+
+		myAgent.destination = goal.transform.position;
+
 	}
 
 	void Update()
@@ -23,7 +40,7 @@ public class followTarget : MonoBehaviour {
 
 
 
-		float myDist=Vector3.Distance(transform.position, myAgent.destination);
+		//float myDist=Vector3.Distance(transform.position, myAgent.destination);
 		
 		//Debug.Log("distance to target: "+myDist);
 		
@@ -38,7 +55,7 @@ public class followTarget : MonoBehaviour {
 		}
 
 
-		myAgent.destination = goal.position;
+		myAgent.destination = goal.transform.position;
 
 	}
 
@@ -53,10 +70,29 @@ public class followTarget : MonoBehaviour {
 			goal=punishmentGoal;
 
 			if (gameObject.tag=="Player"){
-				Debug.Log ("gameOver");
+
+				// husk at fixe så det først er når målet er nået  gameover
+				//levelManagerObject.SendMessage("gameOver");
+				GameState.Instance.gameOver();
+
 			}
 		
 
+		}
+	}
+
+
+	void OnGUI()
+	{
+		
+		string myLevel = GameState.Instance.getLevel ();
+		
+		if (myLevel == "Level_1") {
+			
+			Vector2 targetPos;
+			targetPos = Camera.main.WorldToScreenPoint (transform.position);
+
+			GUI.Box (new Rect (targetPos.x - 50, (Screen.height - targetPos.y) - 30, 100, 20), transform.name + ": " + myStamina);
 		}
 	}
 
